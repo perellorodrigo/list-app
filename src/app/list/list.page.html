@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>list</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <h1>{{headingText}}</h1>
+  <ion-toolbar color="secondary">
+    <ion-input [(ngModel)]="inputText" placeholder="Add new item"></ion-input>
+    <ion-buttons slot="end">
+        <ion-button slot="end" (click)="addItem()">Add</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-list>
+      <ion-item *ngFor="let item of items">
+        <ion-label>{{item}}</ion-label>
+        <ion-button (click)="deleteItem(item)">X</ion-button>
+      </ion-item>
+  </ion-list>
+
+</ion-content>
