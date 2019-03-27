@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
+import { StorageService} from '../storage.service';
+import { promises } from 'fs';
+import { Item } from '../../models/item.model';
 
 @Component({
   selector: 'app-list',
@@ -8,29 +11,64 @@ import { IonItemSliding } from '@ionic/angular';
 })
 export class ListPage implements OnInit {
 
-  constructor() { }
+  constructor(private storage:StorageService) {
+  }
+
+
 
   ngOnInit() {
   }
 
+  ionViewDidEnter(){
+    this.storage.readData('list')
+    .then( (response:any) => {
+      if(response){
+        this.items = JSON.parse(response);
+        this.numberOfItems = this.items.length;
+      }
+    })
+    .catch( (error) => console.log(error));
+  }
+
   inputText:string;
-  headingText:string = "Hello World";
-  items:Array<string> = ['Bread', 'Butter', 'Nutella', 'Milk'];
+  headingText:string = "List App";
+  items:Array<Item> = [];
+  numberOfItems:number;
 
-  deleteItem(itemName: string){
-    let index: number = this.items.indexOf(itemName);
-    this.items.splice(index,1);
+  deleteItem(id:number){
+    let index = this.items.findIndex((item) => item.id == id);
+    this.items.splice(index, 1);
+    this.numberOfItems = this.items.length;
+    this.saveList();
   }
 
-  addItem(){
-    if(this.items.indexOf(this.inputText) !== -1)
-    {
-      alert(this.inputText + " is already on the list");
-    }else{
-      this.items.push(this.inputText);
-      this.inputText = "";
-      alert("New item added");
-    }
+  saveList(){
+    this.storage.saveData('list', this.items )
+    .then((response) => {
+      //data written successfully
+      console.log("Saved successfully");
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
+  
+  addItem(name:string){
+    
+      this.inputText = '';
+      let item = {name: name, id: new Date().getTime(), status: false };
+      this.items.push( item );
+      this.numberOfItems = this.items.length;
+      this.saveList();
+  }
+
+  changeItemStatus(id:number){
+    this.items.forEach((item) => {
+      if(item.id == id){
+        item.status
+      }
+    });
+  }
+  
 
 }
