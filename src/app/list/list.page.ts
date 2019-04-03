@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
 import { StorageService} from '../storage.service';
-import { promises } from 'fs';
 import { Item } from '../../models/item.model';
 
 @Component({
