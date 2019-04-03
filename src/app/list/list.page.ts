@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
 import { StorageService} from '../storage.service';
-import { promises } from 'fs';
 import { Item } from '../../models/item.model';
 
 @Component({
@@ -37,6 +36,7 @@ export class ListPage implements OnInit {
 
   deleteItem(id:number){
     let index = this.items.findIndex((item) => item.id == id);
+    console.log(index);
     this.items.splice(index, 1);
     this.numberOfItems = this.items.length;
     this.saveList();
@@ -50,6 +50,12 @@ export class ListPage implements OnInit {
     })
     .catch((error) => {
       console.log(error);
+    });
+  }
+
+  sortList(){
+    this.items.sort((item1,item2) => {
+      return item2.id - item1.id;
     });
   }
   
