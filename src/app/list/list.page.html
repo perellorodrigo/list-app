@@ -14,9 +14,7 @@
   </ion-toolbar>
   <ion-list>
       <ion-item *ngFor="let item of items">
-        <ion-buttons slot="start">
-            <ion-checkbox [(ngModel)]="item.status" (ionChange)="saveList()" slot="start"></ion-checkbox>
-        </ion-buttons>
+        <ion-checkbox [(ngModel)]="item.status" (ionChange)="saveList()" slot="start"></ion-checkbox>
         <ion-label>{{item.name}} - {{item.status}}</ion-label>
         <ion-buttons slot="end">
           <ion-button (click)="deleteItem(item.id)" fill="clear" slot="end" *ngIf="item.status">
