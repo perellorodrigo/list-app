@@ -7,3 +7,19 @@ ion-input{
     --background: white;
     --color: black;
 }
+
+ion-header{
+    ion-toolbar{
+      ion-title{
+        max-width:150px;
+      }
+      form{
+        display: flex;
+        ion-input{
+          --background: var(--ion-color-light);
+          border-radius: 4px;
+          text-align: left;
+        }
+      }
+    }
+  }
