@@ -18,15 +18,12 @@
           <ion-checkbox [(ngModel)]="item.status" (ionChange)="saveList()" slot="start"></ion-checkbox>
         </ion-buttons>
         <ion-label>{{item.name}} - {{item.status}}</ion-label>
+        <ion-datetime displayFormat="h:mm A" pickerFormat="h mm A" [(ngModel)]="dueDate"></ion-datetime>
         <ion-buttons slot="end">
           <ion-button (click)="deleteItem(item.id)" fill="clear" slot="end" *ngIf="item.status">
             <ion-icon name="close"></ion-icon>
           </ion-button>
-      </ion-buttons>
-<<<<<<< HEAD
+        </ion-buttons>
       </ion-item>
-=======
-      </ion-item> 
->>>>>>> d858e274f41b40f0c1ecab419febab1798d6ba2b
   </ion-list>
 </ion-content>
