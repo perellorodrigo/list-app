@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Item } from 'src/models/item.model';
 import { Observable, from } from 'rxjs';
+import { format } from 'date-fns';
 
 @Injectable({
   providedIn: 'root'
@@ -84,9 +85,12 @@ export class StorageService {
         if( item.id == id ){
           if( item.status == false ){
             item.status = true;
+            const formattedDate = format( new Date() , 'yyyy-MM-dd:HH:mm:ss');
+            item.doneDate = formattedDate;
           }
           else{
             item.status = false;
+            item.doneDate = null;
           }
           this.saveListInStorage();
           resolve(true);

@@ -5,6 +5,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { ListPage } from './list.page';
+import { TimeFromNowModule } from '../timeFromNow/timeFromNow.module';
+
 
 
 const routes: Routes = [
@@ -20,6 +22,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     IonicModule,
+    TimeFromNowModule.forRoot(),
     RouterModule.forChild(routes)
   ],
   declarations: [ListPage]

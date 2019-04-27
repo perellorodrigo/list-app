@@ -8,9 +8,11 @@
   <ion-list>
       <ion-item *ngFor="let item of completedItems" [class.done] = "item.status">
         <ion-buttons slot="start">
-          <ion-checkbox value="item.status" (ionChange)="changeItemStatus(item.id)" slot="start"></ion-checkbox>
+          <ion-checkbox checked="item.status" (ionChange)="changeItemStatus(item.id)" slot="start"></ion-checkbox>
         </ion-buttons>
-        <ion-label>{{item.name}} - {{item.status}}</ion-label>
+        <ion-label>{{item.name}}
+          <p>{{item.doneDate | timeFromNow:'Done'}}</p>
+        </ion-label>
         <ion-buttons slot="end">
           <ion-button (click)="deleteItem(item.id)" fill="clear" slot="end" *ngIf="item.status">
             <ion-icon name="close"></ion-icon>

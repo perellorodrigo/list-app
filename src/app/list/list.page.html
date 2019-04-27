@@ -18,12 +18,10 @@
         <ion-buttons slot="start">
           <ion-checkbox value="item.status" (ionChange)="changeItemStatus(item.id)" slot="start"></ion-checkbox>
         </ion-buttons>
-        <ion-label>{{item.name}} - {{item.status}}</ion-label>
-        <ion-buttons slot="end">
-          <ion-button (click)="deleteItem(item.id)" fill="clear" slot="end" *ngIf="item.status">
-            <ion-icon name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <ion-label>
+          {{item.name}}
+          <p>{{ item.dueDate | timeFromNow:'Due'}}</p>
+        </ion-label>
       </ion-item>
   </ion-list>
 </ion-content>

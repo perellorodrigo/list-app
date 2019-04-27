@@ -3,7 +3,6 @@ import { AlertController } from '@ionic/angular';
 import { StorageService} from '../storage.service';
 import { Item } from '../../models/item.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DateValidator } from  '../validators/date';
 import { format, addHours, addMinutes } from 'date-fns';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
@@ -40,23 +39,19 @@ export class ListPage implements OnInit {
     this.loadPendingItems();
   }
 
-  deleteItem(id:number){
-    console.log("To be deleted: " + id);
-    this.storage.deleteItem(id)
-    .then((response) => {
-      if( response == true ){
-        this.loadPendingItems();
-      }
-    })
-    .catch( (error) => { console.log(error) });
-  }
+
 
   addItem(name:string){
 
     this.inputText = '';
-    let item:Item = {name: name, id: new Date().getTime(), status: false, dueDate: ''};
+    let item:Item = {
+      name: name,
+      id: new Date().getTime(),
+      status: false,
+      dueDate: null,
+      doneDate: null,
+      notifications: new Array<Number>()};
     this.presentAlertPrompt(item);
-
 
   }
 
@@ -112,22 +107,26 @@ export class ListPage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
+            this.storage.addItem(item);
+            this.loadPendingItems();
             
           }
         },
         {
           text: 'Schedule',
           handler: (data) => {
-            if(data.hours)
-            {
-              let dueDate = addHours( new Date(), data.hours );
-              dueDate = addMinutes(dueDate, data.minutes );
-              const formattedDate = format( dueDate , 'yyyy-MM-dd:HH:mm');
-              item.dueDate = formattedDate;
-              this.storage.addItem(item);
-              this.loadPendingItems();
-              this.scheduleReminder(dueDate,item.name);
+            let dueDate = new Date();
+            if(data.hours) {
+              dueDate = addHours( new Date() , data.hours );
             }
+            if (data.minutes){
+              dueDate = addMinutes( dueDate, data.minutes );
+            }
+            const formattedDate = format( dueDate , 'yyyy-MM-dd:HH:mm:ss');
+            item.dueDate = formattedDate;
+            this.storage.addItem(item);
+            this.loadPendingItems();
+            this.scheduleReminder(dueDate,item.name);
           }
         }
       ]
@@ -138,7 +137,7 @@ export class ListPage implements OnInit {
   scheduleReminder( dueDate:Date , text:string ){
     //time in milliseconds
     this.localNotifications.schedule({
-      text: `Remember to ${text}`,
+      text: `${text} is due for Now.`,
       trigger: {at: dueDate },
       led: 'FF0000',
       sound: null
