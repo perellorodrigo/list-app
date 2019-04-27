@@ -1,19 +1,18 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Completed</ion-title>
+  <ion-toolbar color="primary">
+      <ion-title>Completed</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <h1>{{headingText}} - Number of Items: {{numberOfItems}}</h1>
   <ion-list>
-      <ion-item *ngFor="let item of items" [class.done] = "item.status" *ngIf="item.status">
+      <ion-item *ngFor="let item of completedItems" [class.done] = "item.status">
         <ion-buttons slot="start">
-          <ion-checkbox [(ngModel)]="item.status" (ionChange)="saveList()" slot="start"></ion-checkbox>
+          <ion-checkbox value="item.status" (ionChange)="changeItemStatus(item.id)" slot="start"></ion-checkbox>
         </ion-buttons>
         <ion-label>{{item.name}} - {{item.status}}</ion-label>
         <ion-buttons slot="end">
-          <ion-button (click)="deleteItem(item.id)" fill="clear" slot="end">
+          <ion-button (click)="deleteItem(item.id)" fill="clear" slot="end" *ngIf="item.status">
             <ion-icon name="close"></ion-icon>
           </ion-button>
         </ion-buttons>

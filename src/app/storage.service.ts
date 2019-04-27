@@ -41,9 +41,7 @@ export class StorageService {
     });
   }
 
-  addItem( name:string,  dueDate:string ){
-    let item:Item = {name: name, id: new Date().getTime(), status: false, dueDate: dueDate};
-    //this.list$.pipe( map( list => list.push(item) ));
+  addItem( item:Item ){
     this.listOfItems.push( item );
     this.saveListInStorage();
   }
@@ -67,7 +65,7 @@ export class StorageService {
   }
 
   deleteItem( id:number ){
-    return new Promise( (resolve,reject) => {
+    return new Promise( ( resolve , reject)  => {
       this.listOfItems.forEach( ( item, index ) => {
         if( item.id == id ){
           this.listOfItems.splice( index, 1 );
@@ -81,7 +79,7 @@ export class StorageService {
 
 
   toggleItemStatus( id:number ){
-    return new Promise( (resolve,reject) => {
+    return new Promise( (resolve , reject) => {
       this.listOfItems.forEach( ( item, index ) => {
         if( item.id == id ){
           if( item.status == false ){

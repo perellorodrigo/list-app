@@ -1,10 +1,9 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <form [formGroup]="inputForm" (submit)="addItem(inputForm.value.taskName,inputForm.value.dueDate)">
+    <form [formGroup]="inputForm" (submit)="addItem(inputForm.value.taskName)">
       <ion-title>Outstanding</ion-title>
       <ion-input type="text" placeholder="Add a task" color="dark" clear-input formControlName="taskName"></ion-input>
-      <ion-datetime slot="" displayFormat="YYYY-MM-DDTHH:mmZ" clear-input formControlName="dueDate" placeholder="Date" color="secondary"></ion-datetime>
-      <ion-buttons >
+      <ion-buttons>
         <ion-button type="submit" [disabled]="!inputForm.valid">
           <ion-icon name="add"></ion-icon>
         </ion-button>
@@ -14,11 +13,10 @@
 </ion-header>
 
 <ion-content>
-  <h1>{{headingText}} - Number of Items: {{numberOfItems}}</h1>
   <ion-list>
       <ion-item *ngFor="let item of pendingItems" [class.done] = "item.status">
         <ion-buttons slot="start">
-          <ion-checkbox [(ngModel)]="item.status" (ionChange)="saveList()" slot="start"></ion-checkbox>
+          <ion-checkbox value="item.status" (ionChange)="changeItemStatus(item.id)" slot="start"></ion-checkbox>
         </ion-buttons>
         <ion-label>{{item.name}} - {{item.status}}</ion-label>
         <ion-buttons slot="end">
