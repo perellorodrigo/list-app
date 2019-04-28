@@ -9,6 +9,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+//import { TimeInWordsPipe } from './time-in-words.pipe';
 //import { TimeFromNowPipe } from './time-from-now.pipe';
 //import { DueInPipe } from './due-in.pipe';
 

@@ -22,7 +22,6 @@ export class CompletedPage implements OnInit {
   }
   
   deleteItem(id:number){
-    console.log("To be deleted: " + id);
     this.storage.deleteItem(id)
     .then((response) => {
       if( response == true ){
@@ -50,7 +49,6 @@ export class CompletedPage implements OnInit {
     this.storage.toggleItemStatus(id)
     .then((response) => {
       if( response == true ){
-        console.log("Reloading pending");
         this.loadCompletedItems();
       }
     })

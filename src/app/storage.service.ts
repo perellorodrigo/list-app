@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Item } from 'src/models/item.model';
 import { Observable, from } from 'rxjs';
-import { format } from 'date-fns';
+import { format, parse, subSeconds, isAfter, addSeconds } from 'date-fns';
+import { NotificationPreference } from 'src/models/notification.model';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +14,13 @@ import { format } from 'date-fns';
 export class StorageService {
   public listOfItems:Array<Item> = [];
   public listOfItems$:Observable<Item>;
+  public listOfNotifications:Array<NotificationPreference> = [];
+
+  notificationsStorageKey:string = 'notifications';
   listStorageKey:string = 'items';
   
 
-  constructor() {
+  constructor( private localNotifications:LocalNotifications) {
     this.getListFromStorage()
     .then( (data:Array<Item>) =>{
       this.listOfItems   = data;
@@ -21,7 +29,65 @@ export class StorageService {
     .catch( (error) => {
       console.log(error);
     });
- 
+    this.getNotificationsFromStorage()
+    .then( (data:Array<NotificationPreference>) =>{
+      this.listOfNotifications = data;
+      this.setupNotifications();
+    })
+    .catch( (error) => {
+      console.log(error);
+    });
+  }
+
+  setupNotifications(){
+    // Set up the notifications after cancelling all others
+    // Avoid duplicates
+    this.localNotifications.cancelAll().finally(() => {
+      let enabledNotifications = this.listOfNotifications.filter( (notification) => { return notification.isEnabled == true } );
+      let pendingItems = this.listOfItems.filter( (item) => { return item.status == false && item.dueDate != null} );
+      let notificationCounter = 0;
+
+      enabledNotifications.forEach(( notification ) => {
+        pendingItems.forEach((item) => {
+          if (notification.triggerBefore)
+          {
+            let triggerDate = parse(item.dueDate, 'yyyy-MM-dd:HH:mm:ss', new Date());
+            triggerDate = subSeconds(triggerDate,notification.triggerIn);   //Subtract the triggerIn from the date
+            if (isAfter(triggerDate,new Date()))                            // If the date is in the future. Setup the new notification
+            {
+              this.localNotifications.schedule({
+                id: notificationCounter++,
+                text: notification.message + ': '+ item.name,
+                trigger: {at: triggerDate },
+                led: 'FF0000',
+                sound: null
+              });
+            }
+            else{
+              console.log("Cannot setup past notification");
+            }
+          }
+          if (notification.triggerAfter){
+            let triggerDate = parse(item.dueDate, 'yyyy-MM-dd:HH:mm:ss', new Date());
+            triggerDate = addSeconds(triggerDate,notification.triggerIn);   // Add the triggerIn from the date
+            if (isAfter(triggerDate,new Date()))                            // If the date is in the future. Setup the new notification
+            {
+              this.localNotifications.schedule({
+                id: notificationCounter++,
+                text: notification.message + ': '+ item.name,
+                trigger: {at: triggerDate },
+                led: 'FF0000',
+                sound: null
+              });
+            }
+            else{
+              console.log("Cannot setup past notification");
+            }
+          }
+        })
+      });
+  });
+
   }
 
   getListFromStorage(){
@@ -42,9 +108,70 @@ export class StorageService {
     });
   }
 
+  getNotificationsFromStorage(){
+    return new Promise( (resolve,reject) => {
+      try{
+        let data:Array<NotificationPreference> = JSON.parse( localStorage.getItem( this.notificationsStorageKey ) );
+        if( data ){
+          this.listOfNotifications = data;
+          resolve( data );
+        }
+        else{
+          throw('no data for the requested key');
+        }
+      }
+      catch( error ){
+        reject( error );
+      }
+    });
+  }
+
+  saveNotificationsInStorage(){
+    return new Promise( (resolve,reject) => {
+      try{
+        localStorage.setItem( this.notificationsStorageKey , JSON.stringify(this.listOfNotifications) );
+        if( localStorage.getItem( this.notificationsStorageKey ) ){
+          //data can be read, so resolve true
+          resolve( true );
+        }
+        else{
+          throw('data write failed');
+        }
+      }
+      catch(error){
+        reject( error );
+      }
+    });
+  }
+
+  addNewNotification( notification:NotificationPreference){
+    this.listOfNotifications.push( notification );
+    this.saveNotificationsInStorage();
+    this.setupNotifications();
+  }
+
+  deleteNotification( id:number ){
+    return new Promise( ( resolve , reject)  => {
+      this.listOfNotifications.forEach( ( notification, index ) => {
+        if( notification.id == id ){
+          this.listOfNotifications.splice( index, 1 );
+          this.saveNotificationsInStorage().finally(()=>{
+            this.setupNotifications();
+          });
+          resolve( true );
+        }
+      });
+      reject( new Error('item not found') );
+    });
+  }
+
+
   addItem( item:Item ){
     this.listOfItems.push( item );
-    this.saveListInStorage();
+    this.saveListInStorage().finally(() => {
+      this.setupNotifications();
+    });
+    
   }
 
   saveListInStorage(){
@@ -78,6 +205,22 @@ export class StorageService {
     });
   }
 
+  toggleNotification( id:number ){
+    return new Promise( (resolve , reject) => {
+      this.listOfNotifications.forEach( ( notification, index ) => {
+        if( notification.id == id ){
+          notification.isEnabled = !notification.isEnabled;
+          this.saveNotificationsInStorage().finally(() => {
+            this.setupNotifications();
+          });
+          resolve(true);
+          return;
+        }
+      });
+      this.saveNotificationsInStorage();
+      resolve(false);
+    });
+  }
 
   toggleItemStatus( id:number ){
     return new Promise( (resolve , reject) => {
@@ -92,7 +235,9 @@ export class StorageService {
             item.status = false;
             item.doneDate = null;
           }
-          this.saveListInStorage();
+          this.saveListInStorage().finally(() => {
+            this.setupNotifications();
+          });
           resolve(true);
           return;
         }
@@ -101,36 +246,6 @@ export class StorageService {
       resolve(false);
     });
   }
-
-  /*
-  saveData(key, value){
-    return new Promise((resolve,reject) => {
-      window.localStorage.setItem( key, JSON.stringify(value) );
-      if ( window.localStorage.getItem(key)){
-        resolve( true );
-      }else{
-        reject(false);
-      }
-    });
-  }*/
-
-  /*
-  readData( key ){
-    return new Promise((resolve, reject) => {
-      try{
-        let data = window.localStorage.getItem( key );
-        if( data ){
-          resolve( data );
-        }
-        else{
-          throw('No data')
-        }
-      }
-      catch( exception ){
-        reject( exception );
-      }
-    });
-  }*/
 
 
   

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { format, parse, formatDistance } from 'date-fns';
+import { parse, formatDistance } from 'date-fns';
 
 @Pipe({
   name: 'timeFromNow'

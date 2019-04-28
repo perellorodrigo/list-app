@@ -3,6 +3,5 @@ export interface Item{
     id: number;
     status: boolean;
     dueDate: string;
-    doneDate: string;
-    notifications: Array<Number>
+    doneDate: string
 }

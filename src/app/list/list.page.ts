@@ -4,7 +4,6 @@ import { StorageService} from '../storage.service';
 import { Item } from '../../models/item.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { format, addHours, addMinutes } from 'date-fns';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 
 
@@ -24,7 +23,7 @@ export class ListPage implements OnInit {
     private storage:StorageService,
     private formBuilder:FormBuilder,
     private alertController:AlertController,
-    private localNotifications:LocalNotifications) {
+    ) {
   }
 
 
@@ -39,8 +38,6 @@ export class ListPage implements OnInit {
     this.loadPendingItems();
   }
 
-
-
   addItem(name:string){
 
     this.inputText = '';
@@ -49,8 +46,7 @@ export class ListPage implements OnInit {
       id: new Date().getTime(),
       status: false,
       dueDate: null,
-      doneDate: null,
-      notifications: new Array<Number>()};
+      doneDate: null};
     this.presentAlertPrompt(item);
 
   }
@@ -79,7 +75,6 @@ export class ListPage implements OnInit {
     this.storage.toggleItemStatus(id)
     .then((response) => {
       if( response == true ){
-        console.log("Reloading pending");
         this.loadPendingItems();
       }
     })
@@ -109,7 +104,6 @@ export class ListPage implements OnInit {
           handler: () => {
             this.storage.addItem(item);
             this.loadPendingItems();
-            
           }
         },
         {
@@ -126,22 +120,14 @@ export class ListPage implements OnInit {
             item.dueDate = formattedDate;
             this.storage.addItem(item);
             this.loadPendingItems();
-            this.scheduleReminder(dueDate,item.name);
+            this.inputForm.reset();
           }
         }
       ]
     });
     await alert.present();
+
   }
 
-  scheduleReminder( dueDate:Date , text:string ){
-    //time in milliseconds
-    this.localNotifications.schedule({
-      text: `${text} is due for Now.`,
-      trigger: {at: dueDate },
-      led: 'FF0000',
-      sound: null
-    });
-  }
 
 }

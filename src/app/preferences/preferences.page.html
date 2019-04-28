@@ -1,9 +1,76 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Preferences</ion-title>
+    <ion-title>Notifications</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+<form [formGroup]="notificationForm" (submit)="addNotification(notificationForm.value)">
+  <ion-text color="primary">
+      <h2>Create New Notification</h2>
+  </ion-text>
+  <ion-grid>
+      <ion-row>
+        <ion-col>
+            <ion-label>Timing: </ion-label>
+            <ion-input type="number" min="0" max="59" step="1" formControlName="time" side="left" placeholder="Time"></ion-input>
+        </ion-col>
+        <ion-col>
+            <ion-buttons>
+                <ion-select placeholder="Unit" formControlName="unit">
+                  <ion-select-option value="hours">Hours</ion-select-option>
+                  <ion-select-option value="minutes">Minutes</ion-select-option>
+                </ion-select>
+            </ion-buttons>
+        </ion-col>
+        <ion-col>
+          <ion-buttons>
+              <ion-select multiple="true" placeholder="When" formControlName="when"> 
+                  <ion-select-option value="before">Before Due Date</ion-select-option>
+                  <ion-select-option value="after">After Due Date</ion-select-option>
+              </ion-select>
+          </ion-buttons>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-label>Message: </ion-label>
+            <ion-input type="text" formControlName="message" placeholder="Write your custom message..."></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+          <ion-col>
+                  <ion-button type="submit" color="primary" [disabled]="!notificationForm.valid">
+                    <ion-icon name="add">
+                    </ion-icon>
+                      Add 
+                  </ion-button>
+          </ion-col>
+      </ion-row>
+  </ion-grid>
+</form>
+<ion-list>
+    <ion-list-header color="primary">
+        <h2>Your Notifications</h2>
+      </ion-list-header>
+    <ion-item *ngFor="let notification of notificationsList">
+      <ion-buttons slot="start">
+        <ion-checkbox [checked]="notification.isEnabled" (ionChange)="changeNotificationStatus(notification.id)" slot="start"></ion-checkbox>
+      </ion-buttons>
+      <ion-label>
+        {{notification.message}}
+        <p>Trigger: {{notification.triggerIn|timeInWords}}</p> 
+        <p *ngIf="notification.triggerBefore">Before Due Date</p>
+        <p *ngIf="notification.triggerAfter">After Due Date</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button (click)="deleteNotification(notification.id)" fill="clear" slot="end" *ngIf="!notification.isEnabled">
+          <ion-icon name="close"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+</ion-list>
+
+
 
 </ion-content>

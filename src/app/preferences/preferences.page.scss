@@ -1,0 +1,21 @@
+ion-row{
+    max-width: 700px;
+    ion-col{
+        display: flex!important;
+        align-content: center!important;
+        align-items: center!important;
+    }
+}
+ion-input,ion-select {
+    min-width: 100px;
+    --background: var(--ion-color-light);
+    border-radius: 4px;
+    text-align: left;
+    margin-left: 10px;
+    input {
+        text-align: right;
+    }   
+}
+ion-select{
+    --padding-start: 0;
+}
